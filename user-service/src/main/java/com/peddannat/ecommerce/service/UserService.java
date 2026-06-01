@@ -1,13 +1,16 @@
 package com.peddannat.ecommerce.service;
 
-import com.peddannat.ecommerce.model.User;
+import com.peddannat.ecommerce.dto.request.LoginRequest;
+import com.peddannat.ecommerce.dto.request.RegisterRequest;
+import com.peddannat.ecommerce.dto.response.LoginResponse;
+import com.peddannat.ecommerce.dto.response.UserResponse;
 
 public interface UserService {
 
-    User registerUser(User user);
+    UserResponse registerUser(RegisterRequest request);
 
-    User loginUser(String email,String password);
+    LoginResponse loginUser(LoginRequest request);
 
-    User getUserById(Long id);
+    UserResponse getUserById(Long id);
 
 }

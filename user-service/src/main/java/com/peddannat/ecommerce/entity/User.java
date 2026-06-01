@@ -1,4 +1,4 @@
-package com.peddannat.ecommerce.model;
+package com.peddannat.ecommerce.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

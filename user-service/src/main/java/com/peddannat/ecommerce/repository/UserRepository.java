@@ -1,6 +1,6 @@
 package com.peddannat.ecommerce.repository;
 
-import com.peddannat.ecommerce.model.User;
+import com.peddannat.ecommerce.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
