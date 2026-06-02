@@ -8,6 +8,7 @@ import com.peddannat.ecommerce.entity.User;
 import com.peddannat.ecommerce.repository.UserRepository;
 import com.peddannat.ecommerce.security.JwtUtil;
 import com.peddannat.ecommerce.service.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,26 +19,30 @@ public class UserServiceImpl  implements UserService {
 
     private final UserRepository  userRepository;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository,JwtUtil jwtUtil) {
+    public UserServiceImpl(UserRepository userRepository,JwtUtil jwtUtil,PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.jwtUtil =jwtUtil;
+        this.passwordEncoder=passwordEncoder;
     }
 
     @Override
     public UserResponse registerUser(RegisterRequest request) {
 
+        // Create a new user entity from the incoming registration request.
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
         user.setCreatedAt(LocalDateTime.now());
 
         User savedUser =userRepository.save(user);
 
 
-
+        // Return only safe response fields to the client.
         return  new UserResponse(
                 savedUser.getId(),
                 savedUser.getName(),
@@ -45,17 +50,20 @@ public class UserServiceImpl  implements UserService {
                 savedUser.getRole());
     }
 
+
     @Override
     public LoginResponse loginUser(LoginRequest request) {
 
+        // Find the user by email and validate login credentials.
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(()->new RuntimeException("User not found"));
 
-         if(!user.getPassword().equals(request.getPassword())){
+         if(!passwordEncoder.matches(request.getPassword(),user.getPassword())){
              throw  new RuntimeException("Invalid password");
          }
 
-         String token =jwtUtil.generateToken(user.getEmail(),user.getRole());
+        // Generate JWT token after successful authentication.
+        String token =jwtUtil.generateToken(user.getEmail(),user.getRole());
 
         return  new LoginResponse(
                  token,

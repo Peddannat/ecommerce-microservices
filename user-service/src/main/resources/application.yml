@@ -1,6 +1,10 @@
 server:
   port: 8081
 
+jwt:
+  secret: 7A25432646294A404E635266556A586E3272357538782F413F4428472B4B6250 # 256-bit Base64 key
+  expiration: 86400000   # 24 hours
+
 spring:
   application:
     name: USER-SERVICE
@@ -16,6 +20,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+
 
 eureka:
   client:
