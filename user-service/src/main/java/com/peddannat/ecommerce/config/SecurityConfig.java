@@ -25,7 +25,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/register","/api/users/login").permitAll()
 
                         // All other endpoints require authentication
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
                 // JWT-based APIs should not use server-side sessions.
                 .sessionManagement(session->session.
                         sessionCreationPolicy(SessionCreationPolicy.STATELESS));
