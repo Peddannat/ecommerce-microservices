@@ -1,45 +1,80 @@
 package com.peddannat.ecommerce.exception;
 
-import com.peddannat.ecommerce.dto.response.ApiResponse;
+import com.peddannat.ecommerce.dto.response.ErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+/**
+ * Centralized exception handling for product-service.
+ */
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
-    // Handles business-level not found cases in a centralized way
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse<String>> handleResourceNotFound(ResourceNotFoundException ex) {
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
+        log.warn("Resource not found: {}", ex.getMessage());
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.error(ex.getMessage()));
+                .body(new ErrorResponse(
+                        false,
+                        ex.getMessage(),
+                        List.of(ex.getMessage()),
+                        LocalDateTime.now()
+                ));
     }
 
-
-    // Returns the first validation error message from request DTO validation
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<String>> handleValidation(MethodArgumentNotValidException ex) {
-        String message = ex.getBindingResult()
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+        List<String> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .findFirst()
-                .orElse("Validation failed");
+                .toList();
+
+        log.warn("Validation failed: {}", errors);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(message));
+                .body(new ErrorResponse(
+                        false,
+                        "Validation failed",
+                        errors,
+                        LocalDateTime.now()
+                ));
     }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        log.error("Database integrity violation: {}", ex.getMessage());
 
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(
+                        false,
+                        "Database integrity violation",
+                        List.of("Request violates database constraints"),
+                        LocalDateTime.now()
+                ));
+    }
 
-    // Fallback handler for unexpected errors
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<String>> handleGeneric(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error("An unexpected error occurred"));
-    }
+    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
+        log.error("Unexpected error occurred", ex);
 
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(
+                        false,
+                        "An unexpected error occurred",
+                        List.of("Please try again later"),
+                        LocalDateTime.now()
+                ));
+    }
 }

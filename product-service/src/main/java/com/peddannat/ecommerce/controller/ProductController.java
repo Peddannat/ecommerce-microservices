@@ -31,19 +31,14 @@ public class ProductController {
         );
     }
 
-//    @GetMapping
-//    public ResponseEntity<ApiResponse<List<ProductResponse>>> getAllProducts() {
-//        List<ProductResponse> products = productService.getAllProducts();
-//        return ResponseEntity.ok(ApiResponse.success(products, "Products fetched successfully"));
-//    }
-
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ProductResponse>>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "id") String sortBy
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection
     ) {
-        Page<ProductResponse> products = productService.getAllProducts(page, size, sortBy);
+        Page<ProductResponse> products = productService.getAllProducts(page, size, sortBy, sortDirection);
         return ResponseEntity.ok(ApiResponse.success(products, "Products fetched successfully"));
     }
 

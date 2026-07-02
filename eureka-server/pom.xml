@@ -1,47 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- ===== PARENT ===== -->
+    <parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.14</version>
+		<version>3.5.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.peddannat.ecommerce</groupId>
+
+    <!-- ===== PROJECT IDENTITY ===== -->
+    <groupId>com.peddannat.ecommerce</groupId>
 	<artifactId>eureka-server</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+	<version>1.0.0-SNAPSHOT</version>
+    <name>eureka-server</name>
+    <description>
+        Service Registry for Peddannat E-Commerce Platform.
+        All microservices register here and discover each other through this server.
+    </description>
+
+    <!-- ===== GLOBAL PROPERTIES ===== -->
 	<properties>
 		<java.version>21</java.version>
-		<spring-cloud.version>2025.0.2</spring-cloud.version>
+		<spring-cloud.version>2025.0.0</spring-cloud.version>
 	</properties>
+
 	<dependencies>
+
+        <!-- ===== SERVICE REGISTRY ===== -->
+        <!-- Core Eureka Server - enables service registration and discovery -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
 		</dependency>
 
-		<dependency>
+
+        <!-- ===== MONITORING ===== -->
+        <!-- Exposes /actuator/health and /actuator/info endpoints for health checks -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- ===== TESTING ===== -->
+        <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 	</dependencies>
+
+    <!-- ===== SPRING CLOUD BOM ===== -->
+    <!-- Manages all Spring Cloud dependency versions consistently -->
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -54,7 +69,8 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<build>
+    <!-- ===== BUILD ===== -->
+    <build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

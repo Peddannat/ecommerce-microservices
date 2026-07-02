@@ -9,12 +9,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product,Long> {
-    List<Product> findByCategory(String category);
-    List<Product> findByActiveTrue();
-    List<Product> findByCategoryAndActiveTrue(String category);
 
+    // Returns all active products with pagination
     Page<Product> findByActiveTrue(Pageable pageable);
 
-
+    // Returns active products by category ignoring case
+    List<Product> findByCategoryIgnoreCaseAndActiveTrue(String category);
 
 }

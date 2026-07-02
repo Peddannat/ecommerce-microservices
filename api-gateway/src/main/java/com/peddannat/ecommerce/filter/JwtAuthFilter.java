@@ -17,12 +17,20 @@ import reactor.core.publisher.Mono;
 import java.security.Key;
 import java.util.List;
 
+/**
+ * Global JWT Authentication Filter.
+ *
+ * Intercepts every incoming request before routing.
+ * Allows public URLs to pass through without a token.
+ * Rejects all other requests that have a missing or invalid JWT.
+ */
 @Component
 public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     @Value("${jwt.secret}")
     private String secretKey;
 
+    // Requests to these paths bypass JWT validation
     private static final List<String> PUBLIC_URLS = List.of(
             "/api/users/register",
             "/api/users/login"
@@ -36,11 +44,14 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
         String path = exchange.getRequest().getURI().getPath();
 
-        if (PUBLIC_URLS.stream().anyMatch(path::equals)) {
+        // Allow public endpoints without authentication
+        if (isPublicUrl(path)) {
             return chain.filter(exchange);
         }
 
-        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        String authHeader = exchange.getRequest()
+                .getHeaders()
+                .getFirst(HttpHeaders.AUTHORIZATION);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -57,11 +68,21 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
                     .parseClaimsJws(token);
 
             return chain.filter(exchange);
+
         } catch (JwtException e) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
     }
+
+    /**
+     * Checks if the request path is in the public URL list.
+     * Uses startsWith so future sub-paths like /api/users/verify also work if added.
+     */
+    private boolean isPublicUrl(String path) {
+        return PUBLIC_URLS.stream().anyMatch(path::equals);
+    }
+
 
     private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);

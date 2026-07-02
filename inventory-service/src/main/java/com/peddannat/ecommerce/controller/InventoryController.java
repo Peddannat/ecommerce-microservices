@@ -12,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST controller for inventory endpoints.
+ */
 @RestController
 @RequestMapping("/api/inventory")
 @RequiredArgsConstructor

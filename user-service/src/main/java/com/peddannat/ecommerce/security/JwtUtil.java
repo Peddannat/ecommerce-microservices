@@ -12,6 +12,10 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 
+/**
+ * Utility class for generating and validating JWT tokens.
+ * Tokens are signed with HS256 using a Base64-encoded secret key.
+ */
 @Component
 public class JwtUtil {
 
@@ -28,13 +32,13 @@ public class JwtUtil {
              .claim("role",role)
              .setIssuedAt(new Date())
              .setExpiration(new Date(System.currentTimeMillis()+EXPIRATION_MS))
-             .signWith(getKey(), SignatureAlgorithm.HS256)
+             .signWith(getSigningKey(), SignatureAlgorithm.HS256)
              .compact();
     }
 
     public String extractEmail(String token){
         return Jwts.parserBuilder()
-                .setSigningKey(getKey())
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
@@ -44,7 +48,7 @@ public class JwtUtil {
     public boolean isTokenValid(String token){
         try{
             Jwts.parserBuilder()
-                    .setSigningKey(getKey())
+                    .setSigningKey(getSigningKey())
                     .build()
                     .parseClaimsJws(token);
             return  true;
@@ -53,7 +57,7 @@ public class JwtUtil {
         }
     }
 
-    public Key getKey(){
+    public Key getSigningKey(){
         byte[]  keyBytes= Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
