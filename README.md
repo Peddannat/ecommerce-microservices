@@ -25,23 +25,23 @@ At the current stage, the implementation includes user login and registration, J
 
 | Category | Technologies |
 |---|---|
-| Backend | Java, Spring Boot, Spring Web, Spring Data JPA [1] |
+| Backend | Java, Spring Boot, Spring Web, Spring Data JPA  |
 | Security | Spring Security, JWT authentication via API Gateway  |
-| Microservices | Spring Cloud Gateway, Netflix Eureka, OpenFeign, Spring Cloud LoadBalancer [1] |
-| Database | MySQL, Hibernate ORM, HikariCP [1] |
-| Build Tools | Maven [1] |
+| Microservices | Spring Cloud Gateway, Netflix Eureka, OpenFeign, Spring Cloud LoadBalancer  |
+| Database | MySQL, Hibernate ORM, HikariCP  |
+| Build Tools | Maven  |
 | Validation | Jakarta Validation  |
-| Logging | SLF4J, Logback [1] |
+| Logging | SLF4J, Logback  |
 | Testing | Not implemented yet in the provided materials  |
 | Documentation | Markdown README, API response wrappers in codebase  |
 | Containerization | Not implemented yet in the provided materials  |
 | Messaging Queue | Not implemented yet in the provided materials  |
-| Caching | Default Spring Cloud LoadBalancer cache observed; dedicated caching not implemented yet [1] |
-| Cloud | Service discovery through Eureka; cloud deployment config not confirmed [1] |
+| Caching | Default Spring Cloud LoadBalancer cache observed; dedicated caching not implemented yet  |
+| Cloud | Service discovery through Eureka; cloud deployment config not confirmed |
 
 ## 🏗️ Architecture
 
-The implementation uses a gateway-centric microservices architecture where clients call the API Gateway, the gateway validates JWT for protected routes, and the gateway forwards requests to downstream services registered in Eureka. Business services also communicate with each other using OpenFeign and service discovery rather than fixed host URLs.[1]
+The implementation uses a gateway-centric microservices architecture where clients call the API Gateway, the gateway validates JWT for protected routes, and the gateway forwards requests to downstream services registered in Eureka. Business services also communicate with each other using OpenFeign and service discovery rather than fixed host URLs.
 
 ### Existing services
 
@@ -49,7 +49,7 @@ The implementation uses a gateway-centric microservices architecture where clien
 |---|---|
 | API Gateway | Central entry point, route forwarding, JWT validation, protected/public API handling. |
 | Eureka Discovery Server | Registers and discovers all backend services. |
-| User Service | User registration and login, JWT token issuance support, user persistence.[1] |
+| User Service | User registration and login, JWT token issuance support, user persistence. |
 | Product Service | Product creation, update, retrieval, category filtering, and delete operation. |
 | Inventory Service | Inventory creation, stock increase, stock reduction, and stock availability checks. |
 | Order Service | Order placement, fetch by id, fetch by user, cancellation, and order listing. |
@@ -158,8 +158,8 @@ The tables below are based on confirmed controller mappings shared from the impl
 
 | Method | Endpoint | Description | Auth Required | Example Request | Example Response |
 |---|---|---|---|---|---|
-| POST | `/api/users/register` | Register a new user | No  | `{"name":"Pavani","email":"pavani@gmail.com","password":"pavani123"}`  | Wrapped success response with created user data  |
-| POST | `/api/users/login` | Login user and get JWT | No  | `{"email":"pavani@gmail.com","password":"pavani123"}`  | Wrapped success response with token  |
+| POST | `/api/users/register` | Register a new user | No  | `{"name":"Peddanna","email":"Peddanna@gmail.com","password":"Peddanna123"}`  | Wrapped success response with created user data  |
+| POST | `/api/users/login` | Login user and get JWT | No  | `{"email":"Peddanna@gmail.com","password":"Peddanna123"}`  | Wrapped success response with token  |
 
 ### Product Service
 
@@ -208,7 +208,7 @@ The following entities are confirmed from the shared implementation.
 
 | Entity | Fields | Primary Key | Foreign Keys | Relationships |
 |---|---|---|---|---|
-| User | `id`, `name`, `email`, `password`, `role`, `createdAt` inferred from logs and login flow [1] | `id` [1] | None confirmed [1] | Standalone user entity [1] |
+| User | `id`, `name`, `email`, `password`, `role`, `createdAt` inferred from logs and login flow  | `id` | None confirmed  | Standalone user entity  |
 | Product | `id`, `name`, `description`, `price`, `category`, `imageUrl`, `active`, `createdAt`, `updatedAt`  | `id`  | None confirmed  | Referenced by cart and order services through service calls, not JPA relations  |
 | Inventory | `id`, `productId`, `quantity`, `reservedQuantity`, `availableQuantity`, `lastUpdated`  | `id`  | No JPA FK confirmed  | Linked logically to product by `productId`  |
 | Order | `id`, `userId`, `totalAmount`, `status`, `orderDate`, `items` [1] | `id`  | None confirmed  | One order contains multiple order items  |
@@ -223,7 +223,7 @@ The project uses service-level database separation rather than direct entity rel
 
 JWT authentication is implemented at the API Gateway layer, and downstream protected APIs are accessed through Bearer tokens sent in the `Authorization` header. User registration and login are public APIs, while product, inventory, order, and cart APIs are expected to be protected by the gateway security rules.
 
-The implementation uses Spring Security and BCrypt is present in the runtime stack, although an earlier runtime log also showed a password-format problem during login testing, which indicates password encoding consistency is important in the current setup.[1] The JWT secret exists in configuration, but secrets should never be committed in public repositories and should be replaced with environment-based placeholders in documentation.
+The implementation uses Spring Security and BCrypt is present in the runtime stack, although an earlier runtime log also showed a password-format problem during login testing, which indicates password encoding consistency is important in the current setup. The JWT secret exists in configuration, but secrets should never be committed in public repositories and should be replaced with environment-based placeholders in documentation.
 
 ### Public APIs
 
@@ -239,7 +239,7 @@ The implementation uses Spring Security and BCrypt is present in the runtime sta
 
 ## 🔗 Service Communication
 
-Service-to-service communication uses OpenFeign clients with Eureka-based discovery and client-side load balancing rather than hardcoded downstream URLs.[1] Order-service calls inventory-service and product-service, while cart-service calls product-service to validate and enrich cart items.[1]
+Service-to-service communication uses OpenFeign clients with Eureka-based discovery and client-side load balancing rather than hardcoded downstream URLs. Order-service calls inventory-service and product-service, while cart-service calls product-service to validate and enrich cart items.
 
 Gateway routing is configured with uppercase service IDs such as `USER-SERVICE`, `PRODUCT-SERVICE`, `ORDER-SERVICE`, `INVENTORY-SERVICE`, and `CART-SERVICE`, which aligns with the Eureka registration strategy used in the project.
 
@@ -270,9 +270,9 @@ The project uses `application.yml` files for service names, ports, Eureka regist
 |---|---|---|
 | Eureka Server | Not explicitly named in provided code | `8761`  |
 | API Gateway | `API-GATEWAY`  | `8080`  |
-| User Service | `USER-SERVICE` [1] | `8081` [1] |
+| User Service | `USER-SERVICE` | `8081`  |
 | Product Service | `PRODUCT-SERVICE`  | `8082`  |
-| Order Service | `ORDER-SERVICE` [1] | `8083` [1] |
+| Order Service | `ORDER-SERVICE` | `8083` |
 | Inventory Service | `INVENTORY-SERVICE`  | `8084`  |
 | Cart Service | `CART-SERVICE`  | `8085`  |
 
@@ -282,15 +282,15 @@ The project uses `application.yml` files for service names, ports, Eureka regist
 - Database username: `<DB_USERNAME>` 
 - Database password: `<DB_PASSWORD>` 
 
-Profiles and environment-specific configuration are not confirmed in the provided materials.[1]
+Profiles and environment-specific configuration are not confirmed in the provided materials.
 
 ## 🛠️ Installation
 
 ### Prerequisites
 
-- Java 21 or later is recommended based on the confirmed runtime, although some logs also show Java 25 in use during development.[1]
-- Maven installed locally.[1]
-- MySQL server running.[1]
+- Java 21 or later is recommended based on the confirmed runtime, although some logs also show Java 25 in use during development.
+- Maven installed locally.
+- MySQL server running.
 - Git installed.
 
 ### Setup steps
@@ -313,10 +313,10 @@ Use the actual startup order confirmed during testing and integration.
 
 1. Start Eureka Server on `http://localhost:8761`. 
 2. Start API Gateway on `http://localhost:8080`. 
-3. Start User Service on port `8081`. [1]
+3. Start User Service on port `8081`. 
 4. Start Product Service on port `8082`. 
 5. Start Inventory Service on port `8084`. 
-6. Start Order Service on port `8083`. [1]
+6. Start Order Service on port `8083`. 
 7. Start Cart Service on port `8085`. 
 8. Open Eureka dashboard and verify all services are `UP`. 
 9. Use Postman to register, login, obtain JWT, and test protected endpoints through the gateway. 
@@ -327,7 +327,7 @@ Dockerfiles, Docker Compose files, container networks, and volumes are not confi
 
 ## 🔄 API Flow
 
-A typical request flow in the current implementation is client to gateway, gateway authentication, Eureka-based routing, target service execution, optional Feign call to another service, database interaction, and wrapped JSON response back to the client.[1]
+A typical request flow in the current implementation is client to gateway, gateway authentication, Eureka-based routing, target service execution, optional Feign call to another service, database interaction, and wrapped JSON response back to the client.
 
 ```mermaid
 sequenceDiagram
@@ -359,12 +359,12 @@ These improvements are realistic next steps based on the current implementation 
 - Add payment-service for transaction handling.
 - Add notification-service for order status updates.
 - Add Swagger/OpenAPI documentation if not already present externally.
-- Add Dockerfiles and Docker Compose for one-command startup.[1]
+- Add Dockerfiles and Docker Compose for one-command startup.
 - Move secrets to environment variables or a config server.
-- Add unit and integration tests across services.[1]
+- Add unit and integration tests across services.
 - Add distributed tracing and centralized logging.
 - Add circuit breakers and retry policies for Feign clients.
 
 ## 🌟 Project Highlights
 
-This project demonstrates strong backend engineering skills through a practical microservices architecture with independent services, centralized gateway security, Eureka-based discovery, Feign-based communication, layered Spring Boot design, DTO-driven APIs, validation, and exception handling. It also reflects production-style concerns such as route centralization, service isolation, response standardization, and inter-service contracts, even though some production hardening items such as Docker, observability, and externalized secrets are still pending.[1]
+This project demonstrates strong backend engineering skills through a practical microservices architecture with independent services, centralized gateway security, Eureka-based discovery, Feign-based communication, layered Spring Boot design, DTO-driven APIs, validation, and exception handling. It also reflects production-style concerns such as route centralization, service isolation, response standardization, and inter-service contracts, even though some production hardening items such as Docker, observability, and externalized secrets are still pending.
