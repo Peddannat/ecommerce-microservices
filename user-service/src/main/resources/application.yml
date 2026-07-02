@@ -6,8 +6,8 @@ spring:
     name: USER-SERVICE
   datasource:
     url: jdbc:mysql://localhost:3306/user_service_db?createDatabaseIfNotExist=true
-    username: root
-    password: unimplement@#21
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
